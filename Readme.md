@@ -42,6 +42,7 @@ This project also includes a Power BI dashboard for visualizing and presenting t
 💡 For interactive exploration, open the `.pbix` file in Power BI Desktop.
 
 ![Screenshot 2025-05-04 140839](https://github.com/user-attachments/assets/95f4bd42-54c2-4965-9ae1-3e5b7ebf5e4b)
+![Screenshot 2025-05-03 195359](https://github.com/user-attachments/assets/c6702bb5-fff7-4185-8720-840f826e1f5d)
 
 
 ### Key Metrics Displayed:
