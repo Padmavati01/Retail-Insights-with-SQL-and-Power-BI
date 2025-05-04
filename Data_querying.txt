@@ -1,0 +1,89 @@
+-- data querying
+
+--Adding product_category column in transactions
+ALTER TABLE transactions
+ADD COLUMN product_category VARCHAR(50);
+
+UPDATE transactions t
+SET product_category = p.product_category
+FROM products p
+WHERE t.product_id = p.product_id;
+
+-- Total number of transactions made
+SELECT COUNT(*) AS total_transactions
+FROM retail_data_raw;
+
+-- Sum of all sales amount
+SELECT TO_CHAR(SUM(total_amount),'FM999,999,999.00') AS total_sales
+FROM retail_data_raw;
+
+-- Gender-wise customer distribution
+SELECT gender, COUNT(*) AS count
+FROM retail_data_raw
+GROUP BY gender;
+
+-- Average age of customers
+SELECT ROUND(AVG(age)) AS average_age
+FROM retail_data_raw;
+
+-- Monthly-wise sales analysis
+SELECT
+TO_CHAR(date, 'YYYY-MM') AS monthly_sales,
+TO_CHAR(SUM(total_amount), 'FM999,999,999.00') AS total_sales
+FROM retail_data_raw
+GROUP BY TO_CHAR(date, 'YYYY-MM')
+ORDER BY TO_CHAR(date, 'YYYY-MM');
+
+--Product categories that have sales greater than 1000
+SELECT product_category
+FROM retail_data_raw
+GROUP BY product_category
+HAVING SUM(total_amount) > 1000;
+
+--maximum quantity per product
+SELECT product_category, MAX(quantity) AS max_quantity
+FROM transactions
+GROUP BY product_category;
+
+--Top 10 customers based on total spend
+SELECT
+c.customer_id,
+SUM(t.total_amount) AS total_spent
+FROM transactions t
+JOIN customers c ON t.customer_id = c.customer_id
+GROUP BY c.customer_id
+ORDER BY total_spent DESC
+LIMIT 10;
+
+-- Gender-wise total spending for each product category
+SELECT 
+t.product_category,
+c.gender,
+SUM(t.total_amount) AS total_spent
+FROM transactions t
+LEFT JOIN customers c ON t.customer_id = c.customer_id
+GROUP BY t.product_category, c.gender;
+
+-- Top 5 age groups spending on Clothing using CTE
+WITH age_spending AS(
+SELECT
+CASE
+WHEN c.age BETWEEN 18 AND 25 THEN '18-25'
+WHEN c.age BETWEEN 26 AND 35 THEN '26-35'
+WHEN C.age BETWEEN 36 AND 45 THEN '36-45'
+WHEN c.age BETWEEN 46 AND 60 THEN '46-60'
+ELSE '60+'
+END AS age_group,
+t.total_amount
+FROM transactions t
+JOIN customers c ON t.customer_id = c.customer_id
+WHERE t.product_category = 'Clothing'
+)
+SELECT age_group,
+SUM(total_amount) AS total_spent
+FROM age_spending
+GROUP BY age_group
+ORDER BY total_spent DESC
+LIMIT 5;
+
+

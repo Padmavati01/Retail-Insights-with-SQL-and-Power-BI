@@ -1,0 +1,80 @@
+--Schema
+ 
+-- This query creates a table to store retail transaction data & uploading my raw data file after table craetion.....
+CREATE TABLE retail_data_raw(
+transaction_id INT PRIMARY KEY,
+date DATE,
+customer_id VARCHAR(10) UNIQUE,
+gender VARCHAR(10),
+age INT,
+product_category VARCHAR(50),
+quantity INT,
+price_per_unit DECIMAL(10,2),
+total_amount DECIMAL(10,2)
+);
+
+-- Creating a 'customers' table to store customer-related information.
+CREATE TABLE customers(
+customer_id VARCHAR(10) PRIMARY KEY,
+gender VARCHAR(10),
+age INT
+);
+
+-- Inserting distinct customer data from the raw table
+INSERT INTO customers
+SELECT DISTINCT
+customer_id,gender,age FROM retail_data_raw;
+
+-- Creating a 'products' table to store product-related information and creating new column product_id.
+CREATE TABLE products(
+product_id SERIAL PRIMARY KEY, -- Unique ID for each product
+product_category VARCHAR(50),
+price_per_unit DECIMAL(10,2)
+);
+
+-- Inserting data into the products table from retail_data_raw
+INSERT INTO products (product_category, price_per_unit)
+SELECT DISTINCT product_category, price_per_unit
+FROM retail_data_raw;
+
+-- Creating a 'transactions' table.
+CREATE TABLE transactions(
+transaction_id INT PRIMARY KEY,
+date DATE,
+customer_id VARCHAR(10),
+product_id INT,
+quantity INT,
+price_per_unit DECIMAL(10,2),
+total_amount DECIMAL(10,2),
+FOREIGN KEY(customer_id) REFERENCES customers(customer_id),
+FOREIGN KEY(product_id) REFERENCES products(product_id)
+);
+
+-- Inserting transaction records from the raw table & joining tables for new product_id column.
+INSERT INTO transactions(
+transaction_id, date, customer_id, product_id,
+quantity, price_per_unit, total_amount
+)
+SELECT
+r.transaction_id,
+r.date,
+r.customer_id,
+p.product_id,
+r.quantity,
+r.price_per_unit,
+r.total_amount
+FROM retail_data_raw r
+JOIN products p
+ON r.product_category = p.product_category AND r.price_per_unit = p.price_per_unit;
+
+--Adding product_category column in transactions
+ALTER TABLE transactions
+ADD COLUMN product_category VARCHAR(50);
+
+UPDATE transactions t
+SET product_category = p.product_category
+FROM products p
+WHERE t.product_id = p.product_id;
+
+
+
