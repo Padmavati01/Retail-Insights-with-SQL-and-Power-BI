@@ -41,6 +41,9 @@ Retail-SQL-Project/
 This project also includes a Power BI dashboard for visualizing and presenting the insights derived from the SQL analysis.
 💡 For interactive exploration, open the `.pbix` file in Power BI Desktop.
 
+![Screenshot 2025-05-04 140839](https://github.com/user-attachments/assets/95f4bd42-54c2-4965-9ae1-3e5b7ebf5e4b)
+
+
 ### Key Metrics Displayed:
 - Total number of customers and transactions
 - Overall sales revenue
